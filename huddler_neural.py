@@ -228,7 +228,7 @@ class EnhancedDirectionDetector:
                 if re.search(pattern, question_lower):
                     self._update_speaker_patterns(speaker_id, 'direct')
                     return DirectionResult(
-                        AddressingType.DIRECT_NAME, True, 0.95,
+                        AddressingType.DIRECT_NAME, True, 0.97,  # was 0.95
                         f"Direct name addressing: {self.user_name}"
                     )
         
@@ -238,7 +238,7 @@ class EnhancedDirectionDetector:
             if re.search(pattern, question_lower):
                 self._update_speaker_patterns(speaker_id, 'role')
                 return DirectionResult(
-                    AddressingType.ROLE_BASED, True, 0.85,
+                    AddressingType.ROLE_BASED, True, 0.92,  # was 0.85
                     "Role-based addressing detected"
                 )
         
@@ -259,6 +259,7 @@ class EnhancedDirectionDetector:
         for pattern in contextual_patterns:
             if re.search(pattern, question_lower):
                 confidence = self._enhanced_contextual_analysis(question, speaker_id, conversation_context)
+                confidence = max(confidence, 0.85)  # ensure at least 0.85 for contextual
                 self._update_speaker_patterns(speaker_id, 'contextual')
                 return DirectionResult(
                     AddressingType.CONTEXTUAL, confidence > 0.6, confidence,
@@ -277,14 +278,14 @@ class EnhancedDirectionDetector:
             last_msg = conversation_context[-1] if conversation_context else None
             is_question = ql.endswith('?')
             if user_recent and (starts_with_starter or is_question):
-                confidence = 0.8 if starts_with_starter else 0.75
+                confidence = 0.9 if starts_with_starter else 0.85  # was 0.8/0.75
                 # BERT fallback for ambiguous cases (now always use BERT if enabled)
                 if self.use_bert_direction and self.bert_direction and last_msg and last_msg.get('role') == 'user':
                     bert_score = self.bert_direction.is_directed_at_user(last_msg.get('text', ''), question)
                     print(f"[DEBUG] BERT entailment score for contextual follow-up: {bert_score:.3f} (premise: '{last_msg.get('text', '')}', hypothesis: '{question}')")
                     # Lowered threshold from 0.7 to 0.5
                     if bert_score > 0.5:
-                        confidence = max(confidence, 0.9)
+                        confidence = max(confidence, 0.95)
                     else:
                         confidence = min(confidence, 0.5)
                 self._update_speaker_patterns(speaker_id, 'contextual')
@@ -300,7 +301,7 @@ class EnhancedDirectionDetector:
                 if any(question_lower.startswith(starter) for starter in followup_starters):
                     self._update_speaker_patterns(speaker_id, 'contextual')
                     return DirectionResult(
-                        AddressingType.CONTEXTUAL, True, 0.8,
+                        AddressingType.CONTEXTUAL, True, 0.9,  # was 0.8
                         "Fallback: recent user input and follow-up question"
                     )
         return DirectionResult(
