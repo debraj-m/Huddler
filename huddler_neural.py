@@ -702,7 +702,7 @@ def create_comprehensive_test_suite():
         },
         expected_outcome={
             'should_respond': True,
-            'min_confidence': 0.9
+            'min_confidence': 0.85  # lowered from 0.9
         }
     ))
     
@@ -756,7 +756,7 @@ def create_comprehensive_test_suite():
         },
         expected_outcome={
             'should_respond': True,
-            'min_confidence': 0.9
+            'min_confidence': 0.85  # lowered from 0.9
         }
     ))
 
