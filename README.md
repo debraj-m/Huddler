@@ -53,11 +53,6 @@ The test suite covers:
 - Technical and business expertise matching
 - Multi-question messages
 
-## License
-MIT License
 
-## Author
-- [Your Name Here]
 
----
-*This project is for research and educational purposes. Contributions welcome!*
+
